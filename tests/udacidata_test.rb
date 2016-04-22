@@ -161,7 +161,7 @@ class TestUdacidata < MiniTest::Test
   # The "teardown" method always runs after the tests are done
   # "teardown" will delete the test database when tests are done
   def teardown
-    # File.delete(@data_path)
+    File.delete(@data_path)
   end
 
 end
