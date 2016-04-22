@@ -1,4 +1,5 @@
 require_relative 'udacidata'
+require_relative 'find_by'
 
 class Product < Udacidata
   attr_reader :id, :price, :brand, :name
@@ -16,40 +17,10 @@ class Product < Udacidata
     @price = opts[:price]
   end
 
-	def self.create(attributes={})
-		data_path = File.dirname(__FILE__) + "/../data/data.csv"
-		attributes = {brand: attributes[:brand], name: attributes[:name], price: attributes[:price]}
-		product = Product.new(attributes)
-		#check if product already exists
-		unless product.exists?
-			CSV.open(data_path, "a+") do |csv|
-				csv << [product.id, product.brand, product.name, product.price]
-			end
-		end
-		product
-	end
 
-	def self.all
-		data_path = File.dirname(__FILE__) + "/../data/data.csv"
-		products = []
-		CSV.foreach(data_path, headers: true).each do |row|
-				product = Product.new(id: row["id"], brand: row["brand"], name: row["product"], price: row["price"])
-				products << product
-		end
-		products
-	end
+		private
 
-	def self.first
-		self.all.first
-	end
-
-	def exists?
-		Product.all.any?{|product|  product.id == id && product.brand == brand && product.name == name && product.price.to_i == price}
-	end
-
-  private
-
-    # Reads the last line of the data file, and gets the id if one exists
+		# Reads the last line of the data file, and gets the id if one exists
     # If it exists, increment and use this value
     # Otherwise, use 0 as starting ID number
     def get_last_id
