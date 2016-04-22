@@ -30,6 +30,7 @@ class Udacidata
 
 	def self.destroy(id)
 		# snipet from http://stackoverflow.com/questions/26707169/how-to-remove-a-row-from-a-csv-with-ruboy
+		raise ProductNotFound, "There is no product with id: #{id}" if id > Product.all.length
 		product = Product.find(id)
 		data_path = File.dirname(__FILE__) + "/../data/data.csv"
 		table = CSV.table(data_path)
@@ -51,6 +52,7 @@ class Udacidata
 	end
 
 	def self.find(id)
+		raise ProductNotFound, "There is no product with id: #{id}" if id > Product.all.length
 		Product.all.select{|product| product.id == id}[0]
 	end
 
