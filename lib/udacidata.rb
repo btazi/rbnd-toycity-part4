@@ -54,6 +54,30 @@ class Udacidata
 		Product.all.select{|product| product.id == id}[0]
 	end
 
+	def self.where(opts={})
+		selected_objects = []
+		opts.each do |k, v|
+			selected_objects << self.all.select{|object| object.send(k) == v}
+		end
+		selected_objects.flatten!
+		#fix for duplicate objects
+		final_selection = []
+		selected_objects.each do |obj|
+			final_selection << obj unless final_selection.include?(obj)
+		end
+		final_selection
+	end
+
+	def update(opts={})
+		# data_path = File.dirname(__FILE__) + "/../data/data.csv"
+		#change the attributes to the new ones
+		brand = opts[:brand] unless opts[:brand].nil?
+		name = opts[:name] unless opts[:name].nil?
+		price = opts[:price] unless opts[:price].nil?
+		self.class.destroy(id)
+		self.class.create(id: id, brand: brand, name: name, price: price)
+	end
+
 	def exists?
 		Product.all.any?{|product|  product.id == id && product.brand == brand && product.name == name && product.price.to_i == price}
 	end
