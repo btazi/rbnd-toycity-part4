@@ -1,2 +1,4 @@
 *.swp
 *.swo
+data/data.csv
+.DS_Store
