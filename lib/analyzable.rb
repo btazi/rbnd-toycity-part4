@@ -17,7 +17,7 @@ module Analyzable
 		attributes.each do |attr|
 			self.class_eval %{def self.count_by_#{attr}(arg)
 			counts = {} 
-				Product.all.map(&:#{attr}).each do |#{attr}_value|
+				arg.map(&:#{attr}).each do |#{attr}_value|
 					counts[#{attr}_value] = Product.where(#{attr}: #{attr}_value).count 
 				end
 				counts
