@@ -8,7 +8,7 @@ class Udacidata
 	def self.create(attributes={})
 		data_path = File.dirname(__FILE__) + "/../data/data.csv"
 		attributes = {brand: attributes[:brand], name: attributes[:name], price: attributes[:price]}
-		product = Product.new(attributes)
+		product = self.new(attributes)
 		#check if product already exists
 		unless product.exists?
 			CSV.open(data_path, "a+") do |csv|
@@ -20,17 +20,17 @@ class Udacidata
 
 	def self.all
 		data_path = File.dirname(__FILE__) + "/../data/data.csv"
-		products = []
+		objects = []
 		CSV.foreach(data_path, headers: true).each do |row|
-				product = Product.new(id: row["id"], brand: row["brand"], name: row["product"], price: row["price"])
-				products << product
+				object = self.new(id: row["id"], brand: row["brand"], name: row["product"], price: row["price"])
+				objects << object
 		end
-		products
+		objects
 	end
 
 	def self.destroy(id)
 		# snipet from http://stackoverflow.com/questions/26707169/how-to-remove-a-row-from-a-csv-with-ruboy
-		raise ProductNotFound, "There is no product with id: #{id}" if id > Product.all.length
+		raise ProductNotFound, "There is no product with id: #{id}" if id > self.all.length
 		product = Product.find(id)
 		data_path = File.dirname(__FILE__) + "/../data/data.csv"
 		table = CSV.table(data_path)
@@ -71,14 +71,19 @@ class Udacidata
 	end
 
 	def update(opts={})
-		# data_path = File.dirname(__FILE__) + "/../data/data.csv"
 		#change the attributes to the new ones
-		brand = opts[:brand] unless opts[:brand].nil?
-		name = opts[:name] unless opts[:name].nil?
-		price = opts[:price] unless opts[:price].nil?
+		values = self.instance_values
 		self.class.destroy(id)
-		self.class.create(id: id, brand: brand, name: name, price: price)
+		new_values = {} 
+		values.each do |key, value|
+			new_values[key.to_sym] = opts.include?(key.to_sym) ? opts[key.to_sym] : value
+		end
+		self.class.create(new_values)
 	end
+
+	def instance_values # from http://apidock.com/rails/v4.2.1/Object/instance_values
+		    Hash[instance_variables.map { |name| [name[1..-1], instance_variable_get(name)] }]
+	end 
 
 	def exists?
 		Product.all.any?{|product|  product.id == id && product.brand == brand && product.name == name && product.price.to_i == price}
